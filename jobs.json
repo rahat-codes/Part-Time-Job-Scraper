@@ -1,0 +1,32 @@
+[
+    {
+        "title": "Software Engineer",
+        "company": "Tech Corp",
+        "city": "New York",
+        "salary": 95000
+    },
+    {
+        "title": "Data Analyst",
+        "company": "Data Solutions",
+        "city": "San Francisco",
+        "salary": 85000
+    },
+    {
+        "title": "Web Developer",
+        "company": "Creative Agency",
+        "city": "New York",
+        "salary": 70000
+    },
+    {
+        "title": "Product Manager",
+        "company": "Innovate LLC",
+        "city": "Boston",
+        "salary": 110000
+    },
+    {
+        "title": "QA Engineer",
+        "company": "Quality First",
+        "city": "Boston",
+        "salary": 65000
+    }
+]

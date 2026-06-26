@@ -1,3 +1,8 @@
+import json
+import os
+
+DB_FILE = "jobs.json"
+
 # Job listings database stored as a list of dictionaries.
 # Each dictionary represents a job with keys: 'title', 'company', 'city', and 'salary'.
 job_listings = [
@@ -7,6 +12,27 @@ job_listings = [
     {"title": "Product Manager", "company": "Innovate LLC", "city": "Boston", "salary": 110000},
     {"title": "QA Engineer", "company": "Quality First", "city": "Boston", "salary": 65000}
 ]
+
+def load_jobs():
+    """Loads jobs from jobs.json if it exists and is not empty; otherwise saves the default list."""
+    global job_listings
+    if os.path.exists(DB_FILE) and os.path.getsize(DB_FILE) > 0:
+        try:
+            with open(DB_FILE, "r", encoding="utf-8") as f:
+                job_listings = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error loading {DB_FILE}: {e}. Keeping default listings.")
+    else:
+        # If file doesn't exist or is empty, save the current/default listings
+        save_jobs()
+
+def save_jobs():
+    """Saves the current job listings to jobs.json."""
+    try:
+        with open(DB_FILE, "w", encoding="utf-8") as f:
+            json.dump(job_listings, f, indent=4)
+    except IOError as e:
+        print(f"Error saving to {DB_FILE}: {e}")
 
 def display_jobs(jobs):
     """Prints a formatted list of jobs."""
@@ -71,19 +97,49 @@ def add_job():
         "salary": salary
     }
     job_listings.append(new_job)
-    print(f"\nJob listing for '{title}' at '{company}' added successfully!")
+    save_jobs()
+    print(f"\nJob listing for '{title}' at '{company}' added successfully and saved to {DB_FILE}!")
+
+def delete_job():
+    """Prompts the user to delete a job listing by its index."""
+    display_jobs(job_listings)
+    if not job_listings:
+        return
+    
+    print("\n--- Delete a Job Listing ---")
+    while True:
+        choice = input("Enter the Job # to delete (or 'c' to cancel): ").strip()
+        if choice.lower() == 'c':
+            print("Deletion cancelled.")
+            return
+        try:
+            idx = int(choice)
+            if 1 <= idx <= len(job_listings):
+                removed_job = job_listings.pop(idx - 1)
+                save_jobs()
+                print(f"\nJob listing for '{removed_job['title']}' at '{removed_job['company']}' deleted successfully and saved to {DB_FILE}!")
+                break
+            else:
+                print(f"Invalid job number. Please enter a number between 1 and {len(job_listings)}.")
+        except ValueError:
+            print("Please enter a valid number or 'c' to cancel.")
 
 def main():
     """Main loop for the console application menu."""
+    load_jobs()
+    print("\n--- Initial Job Listings Loaded from jobs.json ---")
+    display_jobs(job_listings)
+    
     while True:
         print("\n=== Job Board Console Application ===")
         print("1. View All Job Listings")
         print("2. Search Jobs by City")
         print("3. Search Jobs by Minimum Salary")
         print("4. Add a New Job Listing")
-        print("5. Exit")
+        print("5. Delete a Job Listing")
+        print("6. Exit")
         
-        choice = input("Enter your choice (1-5): ").strip()
+        choice = input("Enter your choice (1-6): ").strip()
         
         if choice == '1':
             display_jobs(job_listings)
@@ -107,10 +163,12 @@ def main():
         elif choice == '4':
             add_job()
         elif choice == '5':
+            delete_job()
+        elif choice == '6':
             print("\nThank you for using the Job Board Console Application. Goodbye!")
             break
         else:
-            print("\nInvalid choice. Please enter a number between 1 and 5.")
+            print("\nInvalid choice. Please enter a number between 1 and 6.")
 
 # Standard Python boilerplate to run the main function when script is executed directly
 if __name__ == "__main__":
